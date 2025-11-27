@@ -1,6 +1,10 @@
 # Final Project Jupyter Notebook Documentation Cheat Sheet
 **Please follow this format whenever you add code or results to the notebooks to keep our repo easily readable.**
 
+Resources for documenting with markdown (please review when able):
+* https://www.markdowntutorial.com
+* https://www.youtube.com/watch?v=_PPWWRV6gbA
+
 ## 1. Add a Markdown Header Before Every Task
 Use this format (copy/paste):
 
@@ -75,7 +79,16 @@ Always state:
 - Why it exists
 ```
 
-This helps Dr. Mohaisen stay on track with what we're doing and also helps me (Emil) write the ADR!
+## 6. If Editing a Script (`.py`)
+Please put a note in the corresponding notebook. You can also copy/paste the code into a corresponding code cell, but just note later that the code was run in a separate notebook. For code from scripts, I recommend pasting into a markdown cell and marking the copy and pasted section as code (and noting where in the repo the corresponding script can be found). Follow the same documentation rules (header, code, interpretation) as above, including if any files were generated. 
+
+Just type three of these [ ` ] before and after code to mark the code block.
+
+```
+# This is an example code block written in markdown. It does not run any code whatsoever, but it outputs visually as a code block. Just type backtick three times before and after your code in order to do this.
+```
+
+Steps 5 & 6 helps Dr. Mohaisen stay on track with what we're doing and also helps me (Emil) write the ADR!
 
 ## 6. Try to Keep Things in Chronological Order
 When adding new content:
