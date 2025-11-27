@@ -69,7 +69,7 @@ This dataset includes well-defined labels for every type of traffic - this lends
 
 4. **Practical for ETL**
 
-Because the dataset is fairly large and the files provided to us are quite diverse, it provides an authentic environment for demonstrating real data engineering tasks.
+Because the dataset is fairly large and the files provided to us are quite diverse, it provides an environment for demonstrating real data engineering tasks.
 
 5. **Alignment with assignment requirements**
 
