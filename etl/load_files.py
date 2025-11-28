@@ -52,7 +52,7 @@ def read_all_files(folder_path):
 
 
 # Usage
-folder_path = "data/raw/fall2025_L/"  # Change the folder path here for your data directory
+folder_path = "../data/raw/fall2025_L/"
 df = read_all_files(folder_path)
 print(f"Combined DataFrame shape: {df.shape}")
 
@@ -83,7 +83,7 @@ print("\nBinary label distribution:")
 print(df['Attack'].value_counts())
 
 # Save the combined dataframe to CSV
-output_path = "data/interm/combined_raw.csv"
+output_path = "../data/interm/combined_raw.csv"
 
 # Create the directory if it doesn't exist
 Path(output_path).parent.mkdir(parents=True, exist_ok=True)
