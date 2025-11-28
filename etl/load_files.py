@@ -52,7 +52,7 @@ def read_all_files(folder_path):
 
 
 # Usage
-folder_path = "fall2025_L/"  # Change the folder path here for your data directory
+folder_path = "data/raw/fall2025_L/"  # Change the folder path here for your data directory
 df = read_all_files(folder_path)
 print(f"Combined DataFrame shape: {df.shape}")
 
