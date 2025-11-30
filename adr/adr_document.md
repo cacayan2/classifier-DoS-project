@@ -69,7 +69,7 @@ This dataset includes well-defined labels for every type of traffic - this lends
 
 4. **Practical for ETL**
 
-Because the dataset is fairly large and the files provided to us are quite diverse, it provides an environment for demonstrating real data engineering tasks.
+Because the dataset is fairly large and the files provided to us are quite diverse, it provides an environment for demonstrating real data engineering tasks. 
 
 5. **Alignment with assignment requirements**
 
@@ -82,13 +82,39 @@ Although this is self-explanatory, it's important to note - this is the dataset 
 
 # 3. Data Integration (Extract)
 ## 3.1 Context and Technology Choice
+The goal of the integration/extract phase of this project is to bring together the raw files provided (a collection of `.csv`, `.parquet`, and `.json` files) from the aforementioned CICIDS dataset and load the files into memory so they can be further digested by univariate and multivariate exploratory data analysis and subsequent model training and testing. To this end we utilized Python libraries with data loading tools (mainly `pands.read_csv()`, `json.load()`, and `pyarrow.parquet.read_table()`). 
+
+This extraction was coded into the script `etl/load_files.py` and documented in `notebooks/00_etl_exploration.ipynb`. The preprocessed data was saved into `data/interm/combined_raw.csv`. This represents the data that will be used for remaining downstream analyses/applications.
+
+This process follows ETL processes generally use for most ML applications and the model introduced in class involving the processing of raw data from multiple sources and unifying into a single dataframe or data representation that is preserved prior to subsequent cleaning or data transformation. 
+
 ## 3.2 Justifications
+Python and its libraries allow for a paradigm that lends itself to big data processing and machine learning applications. The tools outlined in the context and techonology section allowed us to stitch together different data sources into a single dataset that matches the intended structure of the dataset. In particular, the `pandas` module contains different modules that have been well-documented and tested for its ability to handle, merge, and concatenate large structured datasets. Integrating the data into a single file allows for consistent data representation in downstream applications and serves as a checkpoint so that any transformations of the dataset can be traced/rolled back to this intermediate state. 
+
 ## 3.3 Status
+**Status**: Accepted
+**Date**: November 29, 2025
+**Team Members**: Nafisa Sabir (designated ETL lead), agreed upon with Emil Cacayan, Umar Siddiqui, and Fnu Syed Moosa Aleem "Moosa"
 
 # 4. Data Transformation (Transform)
 ## 4.1 Context and Technology Choice
+In the transformation step, the data was cleaned and standardized to increase fidelity and reproducibility of downstream transformations and training. This process includes dropping unnecessary (such as index) columns or duplicates, implementing consistent column naming patterns, and filtering out particular labels (in this case, `Heartbleed` was filtered out due to not being a DoS attack, which models downstream will be trained to discriminate). 
+
+All of these operations are performed in the script `etl/clean_dataset.py` and documented in `notebooks/00_etl_exploration.ipynb`. This cleaned dataset is saved in `data/cleaned/wednesday_clean.csv`, the naming is due to the fact that this dataset (theoretically) contains label from Wednesday traffic, since the Wednesday traffic flows contain the labels required for training our model. Lastly, to ensure this classification task remains binary and not categorical, the different DoS attacks were encoded to binary 0/1 (representing benign or attack respectively). 
+
+In other words,
+
+$$
+\text{Label}(\text{Wednesday}) \in \{\text{DoS GoldenEye}, \text{DoS Hulk}, \text{DoS slowloris}, \text{DoS Heartbleed}, \text{Benign}\}
+$$
+
 ## 4.2 Justifications
+This step is necessary because the raw dataset contains inconsistent column naming conventions across the different file types - testing of this dataset resulted in the failure of downstream processes (creation of duplicate columns, etc.). This could also result in ambiguous columns/features. In addition, numeric fields load as objects/strings - to ensure that transformations can be applied to these numeric features, some must be directly typecastd to float/integer data types. In addition, this assignment is a binary classification task for detecting denial of service attacks - because `Heartbleed` is not a DoS attack, it must be removed, and the remaining features must be encoded to fit the binary classification task. Abstracting this task in code is required for reproducibility internally within the team and with end clients, users, or developers.
+
 ## 4.3 Status
+**Status**: Accepted
+**Date**: November 29, 2025
+**Team Members**: Nafisa Sabir (designated ETL lead), agreed upon with Emil Cacayan, Umar Siddiqui, and Fnu Syed Moosa Aleem "Moosa"
 
 # 5. Data Storage (Load)
 ## 5.1 Context and Technology Choice
