@@ -1,17 +1,17 @@
 # Group Members and Names
 ## Class: COMP 479; Dr. Manar Mohaisen Fall 2025
 - **Emil Cacacayan**
-    + LUC UID:
-    + LUC Student ID:
+    + LUC UID: ecacayan
+    + LUC Student ID: 00001521140
 - **Umar Siddiqui**
-    + LUC UID:
-    + LUC Student ID:
+    + LUC UID: usiddiqui1
+    + LUC Student ID: 00001519781
 - **Nafisa Sabir**
-    + LUC UID:
-    + LUC Student ID:
+    + LUC UID: nsabir
+    + LUC Student ID: 00001729292
 - **Fnu Syed Moosa Aleem "Moosa"**
-    + LUC UID:
-    + LUC Student ID:
+    + LUC UID: fsyedmoosaaleem
+    + LUC Student ID: 00001704732
 
 # 1. Executive Summary and Project Goals
 The goal of this project is to design, train, and evaluate machine learning classifiers that distinguish DoS (denial of service) attacks from benign traffic in the CIC-IDS2017 dataset using Wednesday traffic. DoS attacks are a robustly documented threat in cybersecurity, and there are many tools deployed on the market designed to detect and intervene such attacks. DoS attacks aim to overwhelm some network or service by sending unusually high volumes of traffic or exploiting weaknesses in the protocol, preventing users from accessing the system, hence denial of service (Kumar, Singh, & Sharma, 2020). The motivation for detecting such attacks is primarily financially and security driven: attacks can disrupt business operations and issues with client privacy, and detecting them promptly is a problem with practical and logistical implications.
