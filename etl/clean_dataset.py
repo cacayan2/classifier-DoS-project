@@ -34,3 +34,23 @@ print(f"Columns with all NaN values: {all_nan_columns}")
 df = df.dropna(axis=0, how='any')
 
 print(f"Shape: {df.shape}")
+
+# Load data
+df = pd.read_csv("../data/cleaned/wednesday_cleaned.csv")
+print(f"Original shape: {df.shape}")
+
+# Check infinite values in the two columns
+columns_to_check = ['Flow_Bytes/s', 'Flow_Packets/s']
+
+for col in columns_to_check:
+    inf_count = np.isinf(df[col]).sum()
+    print(f"{col}: {inf_count} infinite values")
+
+# Remove rows with infinite values in these columns
+df = df[np.isfinite(df['Flow_Bytes/s']) & np.isfinite(df['Flow_Packets/s'])]
+
+print(f"New shape: {df.shape}")
+print(f"Rows removed: {61006 - df.shape[0]}")
+
+# Save the cleaned data
+df.to_csv("../data/cleaned/wednesday_cleaned.csv", index=False)
