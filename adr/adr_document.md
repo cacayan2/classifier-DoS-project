@@ -233,9 +233,15 @@ These preliminary evaluations help inform which features may later require speci
 ## 14.3 Status
 
 # 15. References
+Breck, E., Polyzotis, N., Roy, S., Whang, S. E., & Zinkevich, M. (2017). The ML test score: A rubric for production-ready machine learning systems. Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining.
+https://doi.org/10.1145/3097983.3098181
+
 Breck, E., Polyzotis, N., Roy, S., Whang, S. E., & Zinkevich, M. (2019). Data validation for machine learning. In Proceedings of Machine Learning and Systems 1 (pp. 1–16). MLSys. proceedings.mlsys.org
 
 Huyen, C. (2022). Designing machine learning systems: An iterative process for production-ready applications. O'Reilly Media. 
+
+Khaitan, S. K., & McCalley, J. D. (2015). Design techniques and applications of cyberphysical systems: A survey. IEEE Systems Journal, 9(2), 350–365.
+https://doi.org/10.1109/JSYST.2014.2322503
 
 Kumar, P., Singh, A., & Sharma, R. (2020). Denial-of-Service attacks and their mitigation techniques: A survey. International Journal of Network Security, 22(4), 634–648.
 
@@ -244,3 +250,8 @@ Rauf, I., Petre, M., Tun, T., Lopez, T., Lunn, P., Van der Linden, D., Towse, J.
 Ring, M., Wunderlich, S., Scheuring, D., Grüdl, D., Landes, D., & Hotho, A. (2019). A survey of network-based intrusion detection data sets. Computers & Security, 86, 147–167. 
 
 Sharafaldin, I., Lashkari, A. H., & Ghorbani, A. A. (2018). Toward generating a new intrusion detection dataset and intrusion traffic characterization. ICISSP 2018—Proceedings of the 4th International Conference on Information Systems Security and Privacy, 108–116. https://doi.org/10.5220/0006639801080116 
+
+Tiangolo, S. (2018). FastAPI documentation. https://fastapi.tiangolo.com
+
+van der Aalst, W. (2022). Process mining and data quality: A review of challenges and opportunities. ACM Computing Surveys, 55(7), 1–39.
+https://doi.org/10.1145/3527154
