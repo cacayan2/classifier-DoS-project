@@ -105,7 +105,7 @@ All of these operations are performed in the script `etl/clean_dataset.py` and d
 In other words,
 
 $$
-\text{Label}(\text{Wednesday}) \in \{\text{DoS GoldenEye}, \text{DoS Hulk}, \text{DoS slowloris}, \text{DoS Heartbleed}, \text{Benign}\}
+\text{Label}(\text{Wednesday}) \in \left\{\text{DoS GoldenEye}, \text{DoS Hulk}, \text{DoS slowloris}, \text{DoS Heartbleed}, \text{Benign}\right\}
 $$
 
 ## 4.2 Justifications
