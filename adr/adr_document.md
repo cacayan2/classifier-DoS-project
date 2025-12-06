@@ -76,8 +76,8 @@ Because the dataset is fairly large and the files provided to us are quite diver
 Although this is self-explanatory, it's important to note - this is the dataset outlined specifically by the project requirements. 
 
 ## 2.3 Status
-**Status**: Accepted
-**Date**: November 26, 2025
+**Status**: Accepted  
+**Date**: November 26, 2025  
 **Team Members**: Emil Cacayan, Umar Siddiqui, Nafisa Sabir, Fnu Syed Moosa Aleem "Moosa"
 
 # 3. Data Integration (Extract)
@@ -92,8 +92,8 @@ This process follows ETL processes generally use for most ML applications and th
 Python and its libraries allow for a paradigm that lends itself to big data processing and machine learning applications. The tools outlined in the context and techonology section allowed us to stitch together different data sources into a single dataset that matches the intended structure of the dataset. In particular, the `pandas` module contains different modules that have been well-documented and tested for its ability to handle, merge, and concatenate large structured datasets. Integrating the data into a single file allows for consistent data representation in downstream applications and serves as a checkpoint so that any transformations of the dataset can be traced/rolled back to this intermediate state. 
 
 ## 3.3 Status
-**Status**: Accepted
-**Date**: November 29, 2025
+**Status**: Accepted  
+**Date**: November 29, 2025  
 **Team Members**: Nafisa Sabir (designated ETL lead), agreed upon with Emil Cacayan, Umar Siddiqui, and Fnu Syed Moosa Aleem "Moosa"
 
 # 4. Data Transformation (Transform)
@@ -112,8 +112,8 @@ $$
 This step is necessary because the raw dataset contains inconsistent column naming conventions across the different file types - testing of this dataset resulted in the failure of downstream processes (creation of duplicate columns, etc.). This could also result in ambiguous columns/features. In addition, numeric fields load as objects/strings - to ensure that transformations can be applied to these numeric features, some must be directly typecastd to float/integer data types. In addition, this assignment is a binary classification task for detecting denial of service attacks - because `Heartbleed` is not a DoS attack, it must be removed, and the remaining features must be encoded to fit the binary classification task. Abstracting this task in code is required for reproducibility internally within the team and with end clients, users, or developers.
 
 ## 4.3 Status
-**Status**: Accepted
-**Date**: November 29, 2025
+**Status**: Accepted  
+**Date**: November 29, 2025  
 **Team Members**: Nafisa Sabir (designated ETL lead), agreed upon with Emil Cacayan, Umar Siddiqui, and Fnu Syed Moosa Aleem "Moosa"
 
 # 5. Data Storage (Load)
@@ -155,8 +155,8 @@ Highly imbalanced features should be scaled or transformed and may require adjus
 These preliminary evaluations help inform which features may later require special handling during normalization, standardization, transformation, feature selecction, or modeling. This is generally accepted to be machine learning best practice, which emphasize detection of anomalies and artifact to reduce error propogation (Huyen, 2022). 
 
 ## 7.3 Status
-**Status**: Accepted
-**Date**: December 1, 2025
+**Status**: Accepted  
+**Date**: December 1, 2025  
 **Team Members**: Fnu Syed Moosa Aleem "Moosa" (histogram and boxplot generation, outlier detection), Umar Siddiqui (summary statistics, low-variance feature identification, skew investigation), Nafisa Sabir (assisted Moosa with figure saving and summarizing outliers)
 
 # 8. Data Preprocessing
