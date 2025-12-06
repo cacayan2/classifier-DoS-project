@@ -123,8 +123,46 @@ This step is necessary because the raw dataset contains inconsistent column nami
 
 # 6. Reading Data
 ## 6.1 Context and Technology Choice
+Part of the pipeline requires a reliable and replicable workflow for reading data for our classifier model to utilize. After ETL is completed and a cleaned dataset is produced, the next challenge to overcome is ensuring both training and deployment environments are configured to read data in the same way. Small inconsistencies (mismatched column order, unexpected data types, or renamed features) can cause significant model failures during inference. To prevent this, a schema file was defined and implemented and stored as `data/final_features.json`. This schema file defines the following:
+- Expected feature names
+- The data types of each feature
+- Input validation rules
+- Order in which the features must appear, and
+- Any preprocessing statistics needed (especially those required for scaling such as means or standard deviation).
+
+`.json` was selected for the schema format - it is lightweight, widely supported across different languages, and is easily readible within Python. This schema ensures compatibility between our training and deployment scripts, and we will be utilizing the FastAPI service that would load the model and user-submitted feature vectors.
+
+In terms of implementation, we utilize Python's built-in `json` module for reading and parsing the schema during preprocessing. Within the deployment pipeline (`deployment/schema_loader.py`), the `.json` schema is loaded and used to verify incoming API requests before passing them into the trained classifier.
+
+Adopting a formal schema is generally considered best practices for machine learning development and requires explicit and strict data contracts to prevent failures and components receive consistent and well-defined inputs (van der Aalst, 2022). 
+
 ## 6.2 Justifications
+There are quite a few reasons why the use of a schema is not only recommended but essential for the success of this project:
+
+1. **Consistency Between Training and Deployment**
+
+ML models, especially in this application for structured network traffic data, generally require feature alignment. Order and types of the features must be consistent between training or inference or else the model will not behave predictably and may produce incorrect predictions. Our schema guarantees that the model receives data identical in structure to the data it was trained on (Khaitan & McCalley, 2015). 
+
+2. **Preventing Data Drift and Input Errors**
+
+Network traffic datasets are naturally vulnerable to irregularity - many datasets or vectors that may pass through a deployed model may have missing values, unexpected labels, or inconsistent units especially when pooling from multiple different data sources (which is something which was encountered with the dataset used in this project). Using the schema to validate data passed to the model serves as protection and ensures that any and all inputs conform to expected format before inference. This in turn reduces risk of runtime errors and makes the final pipeline more robust (Breck et al., 2017). 
+
+3. **Maintainability and Internal Collaboration**
+
+Multiple team members are involved in handling the ETL, modeling, and deployment within this project. The use of a schema explicitly defines expectations and reduces confusion between the format of dataset used for training and inference. This is especially important in this case where there are multiple notebooks and scripts to manage - this helps reduce the logistical overhead involved with manual coordination (which also lends itself to being error prone). 
+
+4. **Compatibility with FastAPI**
+
+FastAPI supports validation frameworks (such as Pydantic among others) that are able to utilize schema definitions to explicitly enforce the correctness of passed data. Storing the schema in `.json` format allows for seamless integration with these validation tools. This improves the reliability of our API and reduces the chances of incorrect or malformed requests causing runtime error or logical failures (Tiangolo, 2018). 
+
+5. **Reproducibility and Transparency**
+
+Across scientific, machine learning, and intrusion detection research, reproducibility is a requirement. A schema allows future users - groups, instructors, testing, or developers - to have a consistent and definitive reference describing the correct inputs expected by the classifier. Should new data be available for this classifier to be read, retraining and evaluation is relatively trivial compared to having to reverse engineer or carefully document (and follow said documentation) the expected data for the model (i.e., passing incorrectly formatted data to the model *could* work, but that does not mean that it is correct - a logical error) (Ring et al., 2019). 
+
 ## 6.3 Status
+**Status**: Accepted  
+**Date**: December 1, 2025  
+**Team Members**: Nafisa Sabir, Emil Cacayan, Umar Siddiqui, and Fnu Syed Moosa Aleem "Moosa"
 
 # 7. Exploratory Data Analysis
 ## 7.1 Context and Technology Choice
