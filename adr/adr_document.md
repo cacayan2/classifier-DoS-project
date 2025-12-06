@@ -395,8 +395,48 @@ We rooted the selection of the hyperparameters in empirical EDA findings and est
 
 # 12. Model Evaluation
 ## 12.1 Context and Technology Choice
+The evaluation stage focused on assessing the performance of the six selected supervised classification models trained during the modeling phase: Logistic Regression, K-Nearest Neighbors (kNN), Gaussian Naïve Bayes, Decision Tree, Random Forest, and Support Vector Machine (SVM). To ensure consistency and reproducibility, all evaluations were performed using `scikit-learn`'s metrics and plotting utilities, including `classification_report`, `confusion_matrix`, generating ROC curves, and AUC calculations. These tools are widely used in machine learning research and provide standardized and interpretable metrics suitable for comparing different models under identical preprocessing conditions (Pedregosa et al., 2011).
+
+Evluation relied on the test set derived from the 80/20 train-test split. The test set was not used during training, allowing for unbiased evaluation of model generalization. In terms of visualizaiton, we generated confusion matrices and ROC curves for each model to understand misclassification and relative discriminative peroformance across the two labels.
+
+Because our project evaluates binary classification within a cybersecurity context, recall and AUC were important. High recall is essential - failing to identify an attack (false negative) is significantly more harmful than incorrectly marking benign traffic as malicious (false positive). Prior work strongly emphasizes the rationale behind addressing this very asymmetrical risk, making obtaining these metrics appropriate for final model decision making (Kumar et al., 2020; Ring et al., 2019). 
+
+All evaluation steps were implemented in the notebook `notebooks/05_model_evaluation.ipynb` and output stored in:
+- `models/evaluation/confusion_matrices/`
+- `models/evaluation/roc_curves/`
+- `models/evaluation/metrics_tables/`
+
 ## 12.2 Justifications
+We implement the evaluation pipeline as described above for the following reasons:
+
+1. **Consistency Across Models**
+
+In applying identical preprocessing steps (with standardization/transformation where appropriate), identical test sets, and identical evaluation metrics, we ensure that comparisons made between the models are truly meaningful. This follows best practices in machine learning development, where controlling confounding variables is central to investigations (Hastie, Tibshirani, & Friedman, 2009).
+
+2. **Appropriate Metrics for Application**
+
+As mentioned in the project summary, intrusion detection is a high-stakes classification task where false negatives (missed attacks) carry significant repercussions - much more so than false positives. Therefore, we measure recall to directly measure missed attacks, F1-score to balance precision and recall especially for this imbalanced dataset, and AUC-ROC to inform us on the separability between the two traffic types.
+
+These choices align to the strategies used in literature, including the evaluation of this dataset which emphasize recall and ROC metrics to compare models (Sharafaldin et al., 2018).
+
+3. **Visualization for Model Interpretability**
+
+Confusion matrices allow us to diagnose systematic and logical errors, such as a model performing well on benign traffic but struggling on the higher volume DoS samples or a model misclassifying certain labels more often due to traffic similarities. 
+
+Similarly, ROC curves help to identify which models maintain strong classification across different decision thresholds. This is particularly useful for tuning in deployed systems, where thresholds may be adjusted in real time to reduce false positive rates when the system undergoes high transfer loads (Kumar et al., 2020). 
+
+4. **Random Forest and SVM - Expected to Provide Strong Performance**
+
+Prior studies indicate that tree-based ensembles and kernel-based SVM's outperform linear models, especially when interactions or boundaries are non-linear (Ring et al., 2019). Our evaluation structure allows us to validate whether findings in prior literature can generalize to our machine learning pipeline.
+
+5. **Requirements for Deployment**
+
+The evaluation pipeline also allows downstream deployment possesses the model with the strongest detection capability, stable behavior across varied input data and thresholds, and consistent handling of the standardized input schema. These considerations also take into account documented constraints for deployments, where interpretability, consistency, and reduction of false-negatives are essential (Kumar et al., 2020). 
+
 ## 12.3 Status
+**Status**: Accepted
+**Date**: December 6-7, 2025
+**Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan
 
 # 13. Model Deployment
 ## 13.1 Context and Technology Choice
@@ -414,12 +454,18 @@ https://doi.org/10.1145/3097983.3098181
 
 Breck, E., Polyzotis, N., Roy, S., Whang, S. E., & Zinkevich, M. (2019). Data validation for machine learning. In Proceedings of Machine Learning and Systems 1 (pp. 1–16). MLSys. proceedings.mlsys.org
 
+Hastie, T., Tibshirani, R., & Friedman, J. (2009). The elements of statistical learning: Data mining, inference, and prediction (2nd ed.). Springer.
+https://doi.org/10.1007/978-0-387-84858-7
+
 Huyen, C. (2022). Designing machine learning systems: An iterative process for production-ready applications. O'Reilly Media. 
 
 Khaitan, S. K., & McCalley, J. D. (2015). Design techniques and applications of cyberphysical systems: A survey. IEEE Systems Journal, 9(2), 350–365.
 https://doi.org/10.1109/JSYST.2014.2322503
 
 Kumar, P., Singh, A., & Sharma, R. (2020). Denial-of-Service attacks and their mitigation techniques: A survey. International Journal of Network Security, 22(4), 634–648.
+
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., … Duchesnay, E. (2011). Scikit-learn: Machine learning in Python. Journal of Machine Learning Research, 12, 2825–2830.
+https://jmlr.org/papers/v12/pedregosa11a.html
 
 Rauf, I., Petre, M., Tun, T., Lopez, T., Lunn, P., Van der Linden, D., Towse, J., Sharp, H., Levine, M., Rashid, A., & Nuseibeh, B. (2021). The case for adaptive security interventions. ACM Transactions on Software Engineering and Methodology, 31(1), Article 9. https://doi.org/10.1145/3471930
 
