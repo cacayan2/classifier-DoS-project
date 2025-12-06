@@ -170,6 +170,19 @@ The purpose of univariate exploratory data analysis (EDA) is to understand distr
 
 Our team utilized Python, Jupyter notebooks, the Python module `pandas`, `numpy`, and `matplotlib`/`seaborn` for variety of univariate EDA related tasks. These tools were chosen because of their efficiency in processing big data, intuitive visualization capability, and historically being well-documented and tested. All analysis for this stage is stored in the notebook `notebooks/01_univariate_eda.ipynb` and the cleaned dataset used in this analysis can be found in `data/cleaned/wednesday_clean.csv`. 
 
+Bivariate analysis evaluates how different pairs of features relate to one another focusing on correlation patterns and identifying/addressing multicollinearity concerns within the cleaned Wednesday dataset. Understanding these relationships is essential for intrusion detection because many network flow features tend to co-vary in predictable ways during benign or attack service flows (for instance, packet rate often increases/decreases simultaneously with flow byte count or header size) (Kumar et al., 2020).
+
+Similar packages were utilized in the bivariate analysis as the univariate analysis:
+- `pandas` was selected to calculate paired statistics and correlation coefficients
+- `numpy` was used for matrix operations and manipulations
+- `seaborn` and `matplotlib` were used for visualizations (more specifically to generate correlation heatmaps and selected pairplots)
+
+Pearson's correlation coefficient was used to measure linear relationships between the numerical variables. This is common practice in network data analysis (Ring et al., 2019). The heatmap provides a macroscopic view of high-correlation features, while the pairplots allow closer inspection of pairs with suspected collinearity or features that possess higher class discriminatory power.
+
+Because our dataset consists primarily of numeric network flow features, these visualization techniques are appropriate and computationally efficient. They also aid in interpretability for downstream decision-making in an otherwise very skewed and highly dimensional dataset.
+
+The bivariate EDA was completed in `notebooks/02_bivariate_eda.ipynb` by Umar and Moosa. Initial correlation heatmaps and pairplots have been generated, with full results to be finalized as the team completes assigned tasks. Identified collinear features and observed class-separation patterns will help guide preprocessing decisions, model selection, and feature handling in subsequent stages of the pipeline. 
+
 ## 7.2 Justifications
 As mentioned previously, univariate EDA is essential for later preprocessing and modeling decisions for the following reasons:
 
@@ -192,10 +205,32 @@ Highly imbalanced features should be scaled or transformed and may require adjus
 5. **Preparation for Downstream EDA and Modeling**
 These preliminary evaluations help inform which features may later require special handling during normalization, standardization, transformation, feature selecction, or modeling. This is generally accepted to be machine learning best practice, which emphasize detection of anomalies and artifact to reduce error propogation (Huyen, 2022). 
 
+Several motivations support inclusion of bivariate analysis for this project:
+
+1. **Identification of Multicollinear Features**
+
+Intrusion detection datasets often contain engineered or derivative features (i.e. they are some combination of other features) and encode similar phenomena (Sharafaldin et al., 2018). These highly correlated pairs may introduce redundancy into models (e.g. logistic regression, SVM) which causes unnecessary increased computational overhead, instability, or biased (unnecessarily large) coefficients. This analysis helps detect multicollinearity risks, guide decisions on whether dimensionality reduction is appropriate, and highlight which groups of features carry overlapping information. 
+
+2. **Understanding Class Separation Structure**
+
+This whole project assumes there is some underlying structure within the 78 features that allows for discrimination between two class labels - the goal of this project is to capture said structure within a model and use it to classify new data (benign vs. DoS attack). In this context, this is important because attack flow characteristically display abnormal packet timings, payload sizes, and header behaviors, usually presenting as some overexpression of these features (Kumar et al., 2020). If certain pairs show clear separation, these relationships can inform model selection and hyperparameter choices.
+
+3. **Improving Interpretability and Model Robustness**
+
+Examining relationships between features early helps avoid downstream issues such as models overfitting on tightly correlated features, instability in coefficient-based classifiers (coefficients becoming inflated), or skewed decision boundaries when multiple features capture the same underlying signal. As previous work states and demonstrates, in intrusion detection datasets early EDA improves transparency and reduces errors in downstream modeling decisions (Ring et al., 2019). 
+
+4. **Preparation for Decisions on Scaling and Preprocessing**
+
+Correlation analysis provides evidence supporting or refuting normalization or standardization methods during modeling. A dataset that possesses features that vary widely in scale or demonstrate strong covariation ultimately justifies the use of standardization and/or normalization during preprocessing to ensure that the model is trained on a balanced dataset. 
+
 ## 7.3 Status
-**Status**: Accepted  
+**Status**: Accepted (Univariate Analysis)  
 **Date**: December 1, 2025  
 **Team Members**: Fnu Syed Moosa Aleem "Moosa" (histogram and boxplot generation, outlier detection), Umar Siddiqui (summary statistics, low-variance feature identification, skew investigation), Nafisa Sabir (assisted Moosa with figure saving and summarizing outliers)
+
+**Status**: Accepted (Bivariate Analysis)
+**Date**: December 2, 2025
+**Team Members**: Fnu 
 
 # 8. Data Preprocessing
 ## 8.1 Context and Technology Choice
