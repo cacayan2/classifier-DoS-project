@@ -33,7 +33,7 @@ At each step, we document decision-making and justifications and emphasize the l
 
 From an economic perspective, detecting these attacks ultimately support business goals. Especially for businesses that offer online services, being unable to provide these services can cause major losses in revenue and customer trust. In practice, abstraction of many of the ideas discussed in machine learning development (and vice-versa to machine learning engineers) are not required to be understood by business owners and other clients, but as stated earlier the interest comes from the more abstract outcomes - systems that are able to reliably flag traffic as suspicious. Such a tool can help guide manual investigations - something made more robust with structured analysis and careful handling of datasets. This reinforces the need for thoughtful data engineering choices and practices in such applications. 
 
-From a cybersecurity perspective, detecting DoS attacks offers quite a few benefits. The ability to identify such attacks early can help limit service interruptions and reduce impact of an attack. Secondly, recognizing different types of activity allows security teams to design interventions more specifically (Gellen & Weir, 2021). Thirdly, collecting and analyzing traffic data helps networks establish a baseline and compare with future data to determine if a traffic flow contains the fingerprint of malicious transfers. 
+From a cybersecurity perspective, detecting DoS attacks offers quite a few benefits. The ability to identify such attacks early can help limit service interruptions and reduce impact of an attack. Secondly, recognizing different types of activity allows security teams to design interventions more specifically (Rauf et al., 2021). Thirdly, collecting and analyzing traffic data helps networks establish a baseline and compare with future data to determine if a traffic flow contains the fingerprint of malicious transfers. 
 
 Another important project goal is clear communication and collaboration. This is a group project, and so early on in the project design, expertise and interest were expressed by the members of the group. This repository's structure, project board, and communication expectations are designed to help the team maintain organization while ensuring that deliverables are submitted in a timely manner. Each notebook or script serves a purpose, and every team member is expected to record any findings, developments, or decisions in a shared and visible format. This reinforces the way collaboration is performed in the real world where teams coordinate across parts of an even larger workflow. 
 
@@ -55,11 +55,11 @@ The reason for selecting this dataset is twofold - the first is that it is widel
 ## 2.2 Justifications
 This dataset is appropriate for the goals of the project for a few reasons:
 
-1. **The dataset is highly relevant for modern DoS behavior.**
+1. **The dataset is highly relevant for modern DoS behavior**
 
 This dataset includes many different types of DoS attacks along with different strategies, which actually line up pretty well with the descriptions about how DoS attacks have evolved over time (Kumar et al., 2020).
 
-2. **Acceptance of the dataset as a benchmark within cybersecurity and machine learning research.**
+2. **Acceptance of the dataset as a benchmark within cybersecurity and machine learning research**
 
 A few surveys identify this dataset and the rest of its family (CIC-IDS) as one of the more commonly used and meticulously designed options for experimentation (Ring et al., 2019). This allows for our work to be easily comparable with other similar research projects.
 
@@ -128,8 +128,36 @@ This step is necessary because the raw dataset contains inconsistent column nami
 
 # 7. Exploratory Data Analysis
 ## 7.1 Context and Technology Choice
+The purpose of univariate exploratory data analysis (EDA) is to understand distributional properties of features in a dataset prior to exploring relationships between two variables (bivariate analysis) or across multiple features (multivariate analysis). This step identifies inconsistencies, anomalies, outliers, and sources of bias - ensuring that downstream transformations and training rely on robust, meaningful, and interpretable features. Network intrusion often exhibit skewed numerical distributions, heavy-tailed traffic features, or artifact that is inherently present from the somewhat inconsistent sampling of traffic data (i.e. we must address missingness), it is essential that features be examined early and independently prior to building classification models (Ring et al., 2019). 
+
+Our team utilized Python, Jupyter notebooks, the Python module `pandas`, `numpy`, and `matplotlib`/`seaborn` for variety of univariate EDA related tasks. These tools were chosen because of their efficiency in processing big data, intuitive visualization capability, and historically being well-documented and tested. All analysis for this stage is stored in the notebook `notebooks/01_univariate_eda.ipynb` and the cleaned dataset used in this analysis can be found in `data/cleaned/wednesday_clean.csv`. 
+
 ## 7.2 Justifications
+As mentioned previously, univariate EDA is essential for later preprocessing and modeling decisions for the following reasons:
+
+1. **Identification of Outliers**
+
+Many network traffic features demonstrated having very long-tailed distributions - particularly the features having to do with flow duration, packet counts, and byte rates. Univariate EDA assists in identifying outliers that could distort scaling, central tendency statistics, or cause unstable model behavior. Our professor recommended use of the interquartile range method (IQR) for outlier detection and filtering, which we utilized.
+
+2. **Detection of Low-Variance or Zero-Variance Features**
+
+As many academics in statistics courses and papers have stated in the past, variance is information. Features with minimal variance provide little information of utility to a classifier and should be removed or at the very least deprioritized for modeling. Methods such as k-nearest neighbors or SVM's are not robust to features with low or zero-variance particularly when scaling is applied. 
+
+3. **Verification of Data Types and Statistical Properties**
+
+Summary statistics (central tendency such as mean and median and dispersion such as standard deviation and range) were computed to ensure fidelity was not lost for features originally in object type following conversion to numeric. This step is important as occasionally datasets network contain malformed numerical fields with artifact stemming from improper structering, formatting, or invalid characters (Sharafaldin et al., 2018). 
+
+4. **Detection of Skewed Distributions**
+
+Highly imbalanced features should be scaled or transformed and may require adjustments in evaluation approaches. Skew is common in these types of datasets because benign behavior dominates most distributions (Kumar et al., 2020).
+
+5. **Preparation for Downstream EDA and Modeling**
+These preliminary evaluations help inform which features may later require special handling during normalization, standardization, transformation, feature selecction, or modeling. This is generally accepted to be machine learning best practice, which emphasize detection of anomalies and artifact to reduce error propogation (Huyen, 2022). 
+
 ## 7.3 Status
+**Status**: Accepted
+**Date**: December 1, 2025
+**Team Members**: Fnu Syed Moosa Aleem "Moosa" (histogram and boxplot generation, outlier detection), Umar Siddiqui (summary statistics, low-variance feature identification, skew investigation), Nafisa Sabir (assisted Moosa with figure saving and summarizing outliers)
 
 # 8. Data Preprocessing
 ## 8.1 Context and Technology Choice
@@ -167,12 +195,14 @@ This step is necessary because the raw dataset contains inconsistent column nami
 ## 14.3 Status
 
 # 15. References
-Breck, E., Polyzotis, N., Roy, S., Whang, S. E., & Zinkevich, M. (2019). Data validation for machine learning. In Proceedings of Machine Learning and Systems 1 (pp. 1–16). MLSys. 
+Breck, E., Polyzotis, N., Roy, S., Whang, S. E., & Zinkevich, M. (2019). Data validation for machine learning. In Proceedings of Machine Learning and Systems 1 (pp. 1–16). MLSys. proceedings.mlsys.org
 
-Gellen, E. A., & Weir, C. (2021). The case for adaptive security interventions. ACM Computing Surveys, 54(9), 1–36.
+Huyen, C. (2022). Designing machine learning systems: An iterative process for production-ready applications. O'Reilly Media. 
 
-Kumar, P., Singh, A., & Sharma, R. (2020). Denial-of-Service attacks and their mitigation techniques: A survey. International Journal of Network Security, 22(4), 634–648. 
+Kumar, P., Singh, A., & Sharma, R. (2020). Denial-of-Service attacks and their mitigation techniques: A survey. International Journal of Network Security, 22(4), 634–648.
 
-Ring, M., Wunderlich, S., Grüdl, D., Landes, D., & Hotho, A. (2019). A survey of network-based intrusion detection data sets. Computers & Security, 86, 147–167. 
+Rauf, I., Petre, M., Tun, T., Lopez, T., Lunn, P., Van der Linden, D., Towse, J., Sharp, H., Levine, M., Rashid, A., & Nuseibeh, B. (2021). The case for adaptive security interventions. ACM Transactions on Software Engineering and Methodology, 31(1), Article 9. https://doi.org/10.1145/3471930
 
-Sharafaldin, I., Lashkari, A. H., & Ghorbani, A. A. (2018). Toward generating a new intrusion detection dataset and intrusion traffic characterization. ICISSP 2018—Proceedings of the 4th International Conference on Information Systems Security and Privacy, 108–116.
+Ring, M., Wunderlich, S., Scheuring, D., Grüdl, D., Landes, D., & Hotho, A. (2019). A survey of network-based intrusion detection data sets. Computers & Security, 86, 147–167. 
+
+Sharafaldin, I., Lashkari, A. H., & Ghorbani, A. A. (2018). Toward generating a new intrusion detection dataset and intrusion traffic characterization. ICISSP 2018—Proceedings of the 4th International Conference on Information Systems Security and Privacy, 108–116. https://doi.org/10.5220/0006639801080116 
