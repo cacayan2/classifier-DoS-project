@@ -261,12 +261,12 @@ Findings from PCA and clustering guide later stages with information on whether 
 **Date**: December 1, 2025  
 **Team Members**: Fnu Syed Moosa Aleem "Moosa" (histogram and boxplot generation, outlier detection), Umar Siddiqui (summary statistics, low-variance feature identification, skew investigation), Nafisa Sabir (assisted Moosa with figure saving and summarizing outliers), Emil Cacayan
 
-**Status**: Accepted (Bivariate Analysis)
-**Date**: December 2, 2025
+**Status**: Accepted (Bivariate Analysis)  
+**Date**: December 2, 2025  
 **Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan
 
-**Status**: Accepted (Multivariate Analysis)
-**Date**: December 3, 2025
+**Status**: Accepted (Multivariate Analysis)  
+**Date**: December 3, 2025  
 **Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan
 
 # 8. Data Preprocessing
@@ -308,6 +308,10 @@ All models are implemented using `scikit-learn`, consistent with standard practi
 
 Model selection and preprocessing design have been finalized, impelementation can be found in `notebooks/04_model_training.ipynb` and `models/train_simple.py` for simple models, `models/train_complex.py` for complex models. scaling decisions and schema updates have been completed by members of the team responsible for ETL, enabling reproducible model training. Hyperparameter tuning will be limited to essential small adjustments, but may be expanded time permitting. 
 
+In addition to selecting models, the team established a list of initial hyperparameters for each classifier. These intiail configurations are intentionally lighter, reflecting the time constraint of the project and recommended practices for early-stage intrusion detection and machine learning modeling. Prior research indicates that on network traffic, default or near-default hyperparameters are often sufficient for comparisons, with complexity increasing only as evidence of underfitting or overfitting is observed (Ring et al., 2019). 
+
+The project begins with `scikit-learn`'s standard parameters, with adjustments applied only where required for model convergence or numerical stability. This strategy allows the team to refine models in later evaluation stages.
+
 ## 11.2 Justifications
 This paradigm for model selection was adopted for the following reasons:
 
@@ -333,9 +337,60 @@ This modeling strategy was influenced by earlier exploratory findings. High feat
 
 All chosen algorithms integrate cleanly with `scikit-learn`, simplifying deployment via FastAPI application planned for the project's final stage. This ensures consistent preprocessing, schema validation, and inference workflows.
 
+The following hyperparameter settings were selected as initial configurations for the modeling stage:
+
+- Logistic Regression
+    - `solver='liblinear'`, 
+    - `max_iter=1000`
+    - This solver is recommended for binary classification with smaller datasets and performs well in intrusion detection involving collinear features (Kumar et al., 2020). Increasing iteration limit mitigates the risk of non-convergence.
+- k-Nearest Neighbors (kNN)
+    - `n_neighbors=5`
+    - `weights='uniform'`
+    - A small number of neighbors provides balance between sensitivity to local structure and generalization. Previous work demonstrates that kNN performs competitively on CIC-IDS flow features without extensive hyperparameter tuning (Sharafaldin et al., 2018).
+- Naïve Bayes (GaussianNB)
+    - Default parameters
+    GaussianNB is widely used in intrusion detection because of its minimal assumptions and computational efficiency. Its performance is influenced primarily by scaling rather than hyperparameter tuning.
+- Decision Tree
+    - `max_depth=None`
+    - `criterion='gini'`
+    - Allowing unconstrained depth allows the model to capture smaller decision boundaries for the attacks. Later pruning may be considered if overfitting is observed.
+- Random Forest
+    - `n_estimators=100`
+    - `max_depth=None`
+    - Random Forests benefit as ensembles become larger, with a minimum of 100 trees generally recommended for stable performance despite noisy features (Ring et al., 2019).
+- Support Vector Machine (SVM)
+    - `kernel='rbf'`
+    - `C=1.0`
+    - `gamma='scale'`
+    - The RBF kernel performs well on high-dimensional, non-linear datasets. The `gamma='scale'` parameter adjusts sensitivity based on variance, aligning with the skewed distribution found in EDA.
+
+These configurations were chosen specifically to reflect properties observed in the cleaned dataset:
+
+1. **High feature variance and skew**
+
+This provides justification for standardized scaling and kernel-based SVM's.
+
+2. **Correlation structure**
+
+Tree-based methods can leverage redundant features.
+
+3. **Presence of outliers**
+
+Ensemble methods and SVM's with RBF kernels tend to be robust against outliers.
+
+4. **Lack of categorical features**
+
+Most of the features in this dataset are numeric, so hyperparameter tuning does not have to be as complex.
+
+We rooted the selection of the hyperparameters in empirical EDA findings and established literature - and so this stage of the project is grounded in theory and observed data behavior. 
+
 ## 11.3 Status
-**Status**: Accepted
-**Date**: December 4, 2025
+**Status**: Accepted (Model Selection)  
+**Date**: December 4, 2025  
+**Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan
+
+**Status**: Accepted (Hyperparameter Selection)  
+**Date**: December 5, 2025  
 **Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan
 
 # 12. Model Evaluation
