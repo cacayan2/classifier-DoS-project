@@ -434,8 +434,8 @@ Prior studies indicate that tree-based ensembles and kernel-based SVM's outperfo
 The evaluation pipeline also allows downstream deployment possesses the model with the strongest detection capability, stable behavior across varied input data and thresholds, and consistent handling of the standardized input schema. These considerations also take into account documented constraints for deployments, where interpretability, consistency, and reduction of false-negatives are essential (Kumar et al., 2020). 
 
 ## 12.3 Status
-**Status**: Accepted
-**Date**: December 6-7, 2025
+**Status**: Accepted  
+**Date**: December 6-7, 2025  
 **Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan
 
 # 13. Model Deployment
