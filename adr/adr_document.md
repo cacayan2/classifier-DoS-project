@@ -183,6 +183,20 @@ Because our dataset consists primarily of numeric network flow features, these v
 
 The bivariate EDA was completed in `notebooks/02_bivariate_eda.ipynb` by Umar and Moosa. Initial correlation heatmaps and pairplots have been generated, with full results to be finalized as the team completes assigned tasks. Identified collinear features and observed class-separation patterns will help guide preprocessing decisions, model selection, and feature handling in subsequent stages of the pipeline. 
 
+The multivariate analysis expands upon the earlier work by examining structure of the dataset across multiple features simultaneously. This assists in the identification of high-dimensional patterns not visible in univariate or bivariate analysis. Two primary techniques were selected:
+
+1. **Principal Component Analyais (PCA)**
+
+This was used to project the 78-feature dataset into a lower-dimensional space across axes capturing the highest variation to identify features that dominate variation and explore whether benign and DoS traffic exhibit separable structure in aggregated feature combinations. This is widely used in intrusion-detection research and machine learning at large to understand structure in highly dimensional datasets (Ring et al., 2019; Sharafaldin et al., 2018). 
+
+2. **K-Means Clustering**
+
+This is method was utilized not for its power as a classifier (since it assumes numbers of clusters as a hyperparameter and highly spherical data, which this dataset likely violates), but is used as a preliminary assessment for determining if the data naturally forms groupings that resemble the attack and benign labelling. Clustering provides insight into whether the dataset contains meaningful high-dimensional separaiton and can reveal mislabeled, ambiguous, or outlier samples (Kumar et al., 2020). 
+
+These analyses were performed in Python using `scikit-learn`, which is considered part of a standard workflow in modern intrusion detection and other machine learning pipelines. PCA aids visualization and informs potential dimensionality-reduction decisions, while clustering helps evaluate separability and structural consistency before model training. 
+
+Multivarite analysis was completed in `notebooks/03_multivariate_eda.ipynb`, with Nafisa leading PCA and K-means implementation and Moosa producing corresponding visualizations. Preliminary PCA results show identifiable variance structure, and clustering procedures will be further evaluated for alignment with true attack labels. Full results will be finalized and incorporate into the modeling decisions in subsequent steps of this machine learning development paradigm. 
+
 ## 7.2 Justifications
 As mentioned previously, univariate EDA is essential for later preprocessing and modeling decisions for the following reasons:
 
@@ -223,14 +237,36 @@ Examining relationships between features early helps avoid downstream issues suc
 
 Correlation analysis provides evidence supporting or refuting normalization or standardization methods during modeling. A dataset that possesses features that vary widely in scale or demonstrate strong covariation ultimately justifies the use of standardization and/or normalization during preprocessing to ensure that the model is trained on a balanced dataset. 
 
+The multivariate paradigm that we implemented was chosen for the following reasons:
+
+1. **Understanding High Dimensional Patterns**
+
+Network intrusion data typically contains dozens of engineered numerical features that capture variations in packet size, timing, flow duration, and header characteristics. These variables often interact in complex ways during attacks (Kumar et al., 2020). This analysis reveals whether attack behavior differs in aggregate structure compared to benign traffic, whether groups of features jointly contribute to identifiable variations in the dataset, and whether the dataset exhibits redundancy consistent with strong feature correlations detected earlier. This is important because redundancy in highly dimensional datasets will affect downstream model stability and will provide justification for dimensionality reduction.
+
+2. **Informing Model Decisions**
+
+PCA visualization indicates whether the dataset contains clear separation between classes in the axes of greatest variation, overlapping clusters that may demonstrate non-linear separability, and axes of variance dominated by noise or redundancy. This information is relevant to model selection and hyperparameter in downstream steps of the pipeline. 
+
+3. **Evaluating Natural Grouping Behavior**
+
+Perhaps the data naturally groups into spherical clusters for benign vs. attack labels. K-Means clustering as an unsupervised learning method helps evaluate whether benign and attack traffic naturally separate in the absence of labels. Prior work demonstrated that DoS traffic often forms dense, distinct clusters due to the extreme, sustained packet characteristics associated with attacks (Sharafaldin et al., 2018). If clustering aligns with these labels, this provides evidence for dataset consistency and separability.
+
+4. **Supporting Downstream Preprocessing**
+
+Findings from PCA and clustering guide later stages with information on whether scaling is appropriate and which features to scale, whether dimensionality reduction is beneficial, whether certain groups of features contribute disproportionately to the variance of the dataset, and information on how to interpret model-training and inference results based on structural characteristics. These decisions improve both interpretability and performance of the final models. 
+
 ## 7.3 Status
 **Status**: Accepted (Univariate Analysis)  
 **Date**: December 1, 2025  
-**Team Members**: Fnu Syed Moosa Aleem "Moosa" (histogram and boxplot generation, outlier detection), Umar Siddiqui (summary statistics, low-variance feature identification, skew investigation), Nafisa Sabir (assisted Moosa with figure saving and summarizing outliers)
+**Team Members**: Fnu Syed Moosa Aleem "Moosa" (histogram and boxplot generation, outlier detection), Umar Siddiqui (summary statistics, low-variance feature identification, skew investigation), Nafisa Sabir (assisted Moosa with figure saving and summarizing outliers), Emil Cacayan
 
 **Status**: Accepted (Bivariate Analysis)
 **Date**: December 2, 2025
-**Team Members**: Fnu 
+**Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan
+
+**Status**: Accepted (Multivariate Analysis)
+**Date**: December 3, 2025
+**Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan
 
 # 8. Data Preprocessing
 ## 8.1 Context and Technology Choice
