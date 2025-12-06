@@ -217,6 +217,7 @@ Summary statistics (central tendency such as mean and median and dispersion such
 Highly imbalanced features should be scaled or transformed and may require adjustments in evaluation approaches. Skew is common in these types of datasets because benign behavior dominates most distributions (Kumar et al., 2020).
 
 5. **Preparation for Downstream EDA and Modeling**
+
 These preliminary evaluations help inform which features may later require special handling during normalization, standardization, transformation, feature selecction, or modeling. This is generally accepted to be machine learning best practice, which emphasize detection of anomalies and artifact to reduce error propogation (Huyen, 2022). 
 
 Several motivations support inclusion of bivariate analysis for this project:
@@ -285,8 +286,57 @@ Findings from PCA and clustering guide later stages with information on whether 
 
 # 11. Model Selection and Training
 ## 11.1 Context and Technology Choice
+The modeling plan defines how the project transitions from exploratory analysis into supervised learning for binary classification of benign vs. DoS network flows. Because the CIC-IDS 2017 dataset contains high-dimensional numerical features with known redundancy and variation in scale, the team selected a combination of simple baseline models and more complex non-linear models to compare performance and interpretability.
+
+The chosen models include:
+
+- **Simple Models**
+    - Logistic Regression
+    - k-Nearest Neighbors (kNN)
+    - Naïve Bayes
+
+These models provide interpretable comparisons and establish a baseline for expected performance. Logistic regression is frequently used in intrusion detection due to historical robustness and interpretability (Ring et al., 2019), while Naïve Bayes and kNN are non-parametric baselines for this type of dataset. 
+
+- **Complex Models**
+    - Decision Tree
+    - Random Forest
+    - Support Vector Machine (SVM)
+
+These models were selected because DoS traffic can exhibit complex non-linear boundaries and hierarchical interactions between features (Kumar et al., 2020). Tree-based models can naturally capture threshold-based structure common in flow features, while SVM's are known to perform well on these types of datasets (Sharafaldin et al., 2018). 
+
+All models are implemented using `scikit-learn`, consistent with standard practices in modern machine learning pipelines. Data is split into training and testing sets, and preprocessing (such as standardization) is applied to the training set only, ensuring integrity of evaluation. 
+
+Model selection and preprocessing design have been finalized, impelementation can be found in `notebooks/04_model_training.ipynb` and `models/train_simple.py` for simple models, `models/train_complex.py` for complex models. scaling decisions and schema updates have been completed by members of the team responsible for ETL, enabling reproducible model training. Hyperparameter tuning will be limited to essential small adjustments, but may be expanded time permitting. 
+
 ## 11.2 Justifications
+This paradigm for model selection was adopted for the following reasons:
+
+1. **Multiple Model Comparisons**
+
+Using a diverse set of model types reflects research rigor but also addresses practical uncertainty regarding which algorithm best captures the structure of DoS behavior (within this dataset). Prior studies demonstrate how attack classification performance varies significantly across algorithms due to differences in flow timing, packet dynamics, and the unbalanced behavior expected of DoS events (Sharafaldin et al., 2018; Ring et al., 2019). 
+
+In comparing the baseline and complex models, this team achieves the following:
+- meaningful benchmarks between models that assume linear separability vs. models that capture probabilistic behavior
+- investigation of non-linear relationships through trees and SVM's
+- evaluation of robustness to high-dimensional input
+- opportunities for improved generalization using bagging/ensemble methods (e.g. Random Forest)
+
+2. **Scaling Requirements**
+
+Many flow-based features (as demonstrated as well in our preliminary analyses) demonstrate high variance in magnitude (e.g. packet rat and byte statistics). Algorithms such as kNN and SVM are sensitive to this scale and require standardization to make comparisons fairly. This decision is consistent with recommended best practices for intrusion detection datasets and machine learning at large (Kumar et al., 2020). 
+
+3. **Alignment with EDA**
+
+This modeling strategy was influenced by earlier exploratory findings. High feature correlation suggests that linear models may underfit but may be robust in their interpretability. Clusters observed in the multivariate analysis indicate possible non-linear structure, supporting the decision to utilize SVM and ensemble models. Outliers characteristic of DoS flows reinforce the need for models robust to extreme models (trees). Modeling decisions are therefore informed by empirical evidence rather than arbtirary selection or heuristics based on preference. 
+
+4. **Reproducibility and Deployment**
+
+All chosen algorithms integrate cleanly with `scikit-learn`, simplifying deployment via FastAPI application planned for the project's final stage. This ensures consistent preprocessing, schema validation, and inference workflows.
+
 ## 11.3 Status
+**Status**: Accepted
+**Date**: December 4, 2025
+**Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan
 
 # 12. Model Evaluation
 ## 12.1 Context and Technology Choice
