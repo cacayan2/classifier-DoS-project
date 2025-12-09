@@ -406,6 +406,8 @@ All evaluation steps were implemented in the notebook `notebooks/05_model_evalua
 - `models/evaluation/roc_curves/`
 - `models/evaluation/metrics_tables/`
 
+Following evaluation, across all computed metrics, the Random Forest classifier demonstrated the most robust generalization performance and achieved the strongest balance of precision, recall, and F1-score. Visual inspection of these curves demonstrated that this model dominates other models. For this project, Random Forest has been selected as the primary model for deployment in the subsequent development of inference in the deployment API. The `.pkl` file corresponding to the model has been saved to `models/saved_model/`, and the architecture outlined in section 13 assumes its use as the deployed classifier. 
+
 ## 12.2 Justifications
 We implement the evaluation pipeline as described above for the following reasons:
 
