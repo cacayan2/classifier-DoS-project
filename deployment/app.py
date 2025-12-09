@@ -18,7 +18,7 @@ SCHEMA_PATH = Path("data/final_features.json")
 schema = load_schema(SCHEMA_PATH)
 
 # Load the trained model
-MODEL_PATH = Path("models/saved_model/best_model.pkl")
+MODEL_PATH = Path("models/saved_model/random_forest.pkl")
 
 # This logic is required because as of the writing of this code, no model has been trained. 
 if MODEL_PATH.exists():
