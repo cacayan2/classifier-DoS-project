@@ -1,7 +1,12 @@
 from fastapi import FastAPI, HTTPException
 import joblib
-import json
 from pathlib import Path
+import sys
+import sklearn
+
+# Add project root to path
+project_root = Path("..").resolve()
+sys.path.insert(0, str(project_root))
 
 from deployment.schema_loader import load_schema
 from deployment.preprocessing import Preprocessor
@@ -14,14 +19,14 @@ app = FastAPI(
 )
 
 # Load the schema
-SCHEMA_PATH = Path("data/final_features.json")
+SCHEMA_PATH = Path(project_root / "data/final_features.json")
 schema = load_schema(SCHEMA_PATH)
 
 # Then we create the preprocessor object.
 preprocessor = Preprocessor(schema_path = SCHEMA_PATH)
 
 # Load the trained model
-MODEL_PATH = Path("models/saved_model/random_forest.pkl")
+MODEL_PATH = Path(project_root / "models/saved_model/random_forest.pkl")
 
 # This logic is required because as of the writing of this code, no model has been trained. 
 if MODEL_PATH.exists():
