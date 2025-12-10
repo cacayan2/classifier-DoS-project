@@ -1,6 +1,7 @@
 # Group Members and Names
 ## Class: COMP 479; Dr. Manar Mohaisen Fall 2025
 ## Final Project ADR
+## Github Repo: https://github.com/cacayan2/classifier-DoS-project
 - **Emil Cacacayan**
     + LUC UID: ecacayan
     + LUC Student ID: 00001521140
@@ -119,8 +120,21 @@ This step is necessary because the raw dataset contains inconsistent column nami
 
 # 5. Data Storage (Load)
 ## 5.1 Context and Technology Choice
+The processed dataset is stored in a csv file in `data/final/wednesday_clean.csv` and is loaded in the script `etl/load_files.py` and documented in `notebooks/00_etl_exploration.ipynb`.This file represents the cleaned, de-duplicated, and type-corrected dataset. The CSV format was selected because it is portable, human readable, and easily ingestible in other Python workflows (such as `pandas`). We use the library's `read_csv` method to load the data into a DataFrame. This operation loads the full dataset into memory and preserves all numeric and categorical features required for schema generation, preprocessing, feature engineering, exploratory analysis, and model training. Because the dataset is not too large, no complex storage management systems were required.
+
 ## 5.2 Justifications
+1. **CSV ensures transparency and easy debugging.**
+
+2. **File size is manageable allowing for faster read times.
+
+3. **No nested or multi-table structure exist - data is stored flat.**
+
+4. **Dataset is reference consistently across notebooks and scripts, ensuring reproducibility. This dataset serves as canonical truth for other downstream components. 
+
 ## 5.3 Status
+**Status**: Accepted
+**Date**: November 29, 2025
+**Team Members**: Nafisa Sabir (designated ETL lead), agreed upon with Emil Cacayan, Umar Siddiqui, and Fnu Syed Moosa Aleem "Moosa"
 
 # 6. Reading Data
 ## 6.1 Context and Technology Choice
@@ -324,6 +338,32 @@ Cleaning and normalizing features reduces instability and prevents misleading pa
 # 10. Processed Data Loading
 ## 10.1 Context and Technology Choice
 Processed data loading refers to the process where cleaned, feature-engineered data is read into memory in preparation for modeling, evaluation, and/or deployment. In this project, the processed dataset is stored in `data/cleaned/wednesday_cleaned.csv` and loaded using `pandas` (see [7 Exploratory Data Analysis](#7-exploratory-data-analysis)). This tool was selected mainly because it integrates naturally with downstream libraries such as `scikit-learn` and `numpy`. It also contains several operations for dealing with missing values, type casting, indexing, and other vectorized operations. In addition to loading the cleaned `.csv` file, the pipeline loads the feature schema (`final_features.json` see section [6 Reading Data](#6-reading-data)) into a dictionary for later use. The schema is accessed using Python's built-in `json` module and the team implemented loader functions in `deployment/schema_loader.py`. This design serves as a contract to prevent inconsistency between training and serving (Zaharia et al., 2019).The processed data loading in this context involves two components: loading the cleaned dataset into a `pandas` dataframe, then loading the feature schema. Both components are already integrated into the preprocessing and inference pipelines. Future adjustments may include adding further validation warnings or a more robust error handling module, but deliverables satisfy requirements as-is. 
+
+Below you can find the first 20 rows of the cleaned dataset:
+| Destination_Port | Flow_Duration | Total_Fwd_Packets | Total_Backward_Packets | Total_Length_of_Fwd_Packets | ...   | Idle_Std | Idle_Max     | Idle_Min | Label    | Attack |   |
+|------------------|---------------|-------------------|------------------------|-----------------------------|-------|----------|--------------|----------|----------|--------|---|
+| 0                | 443           | 87261             | 1                      | 1                           | 0     | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 1                | 443           | 523               | 2                      | 0                           | 0     | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 2                | 53            | 94304             | 1                      | 1                           | 56    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 3                | 53            | 207               | 2                      | 2                           | 84    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 4                | 123           | 69022032          | 2                      | 2                           | 96    | ...      | 0.00000      | 69000000 | 69000000 | BENIGN | 0 |
+| 5                | 49260         | 3                 | 2                      | 0                           | 37    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 6                | 45198         | 99451595          | 6                      | 6                           | 11595 | ...      | 0.00000      | 99300000 | 99300000 | BENIGN | 0 |
+| 7                | 53            | 61533             | 1                      | 1                           | 42    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 8                | 53            | 66577             | 2                      | 2                           | 82    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 9                | 443           | 83830             | 7                      | 8                           | 6150  | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 10               | 53            | 31141             | 1                      | 1                           | 38    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 11               | 53            | 99777             | 2                      | 2                           | 66    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 12               | 443           | 29810309          | 6                      | 7                           | 3149  | ...      | 314803.15880 | 10000000 | 9470465  | BENIGN | 0 |
+| 13               | 53625         | 238               | 2                      | 0                           | 12    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 14               | 53            | 121869            | 2                      | 2                           | 74    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 15               | 53            | 23382             | 1                      | 1                           | 52    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 16               | 53            | 27059             | 2                      | 2                           | 68    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 17               | 53            | 258               | 2                      | 2                           | 68    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+| 18               | 443           | 62305042          | 22                     | 19                          | 4535  | ...      | 11269.43746  | 10000000 | 9972727  | BENIGN | 0 |
+| 19               | 80            | 5848097           | 3                      | 1                           | 12    | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
+
+Please visit the GitHub repo and find `data/cleaned/wednesday_clean.csv` for the full dataset. This dataset is highly dimensional so it would be infeasible to fit the entire dataframe into this ADR.
 
 ## 10.2 Justifications
 1. **Ensures Consistency Between Training and Deployment**
