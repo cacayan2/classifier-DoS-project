@@ -23,34 +23,33 @@ class Preprocessor:
         self.feature_means = np.array(scaler_params["feature_means"], dtype = float)
         self.feature_stds = np.array(scaler_params["feature_stds"], dtype = float)
 
+        # Sanity check to ensure the feature names, means, and stds are the same length
+        if len(self.feature_names) != len(self.feature_means) or len(self.feature_names) != len(self.feature_stds):
+            raise ValueError("Feature names, means, and stds are not the same length")
+
         # Convert the numeric types to a dictionary for faster lookup. 
         self.numeric_types = {
             k: v["dtype"]
-            for k, v in self.schema.items()
-            if isinstance(v, dict) and v.get("feature_type") == "numeric"
+            for k, v in schema.items()
+            if isinstance(v, dict) and v.get("feature_type") == "numeric" and not k.startswith("_") and k != "scaler_params"
         }
         
         self.n_features = len(self.feature_names)
 
     def validate_input(self, sample: dict):
-        # Sanity check to ensure the feature names, means, and stds are the same length
-        if len(self.feature_names) != len(self.feature_means) or len(self.feature_names) != len(self.feature_stds):
-            raise ValueError("Feature names, means, and stds are not the same length")
-
         # Check for missing fields. 
-        for f in self.features:
+        for f in self.feature_names:
             if not f in sample:
                 raise ValueError(f"Missing feature {f}")
         
         # Check for unexpected fields.
         for k in sample.keys():
-            if k not in self.features:
+            if k not in self.feature_names:
                 raise ValueError(f"Unexpected feature {k}")
         
         # Validate the numeric types.
-        for key, expected_type in self.numeric_types.items():
-            value = sample[key]
-            
+        for key, value in sample.items():
+
             # Raise exception if the value is null.
             if value is None:
                 raise ValueError(f"Field '{key}' cannot be null.")
@@ -72,10 +71,10 @@ class Preprocessor:
         :param X: The dataset to be scaled (numpy array). 
         """
         # If the std is too small, replace it with 1.0
-        safe_stds = np.where(self.stds < 1e-12, 1.0, self.stds)
+        safe_stds = np.where(self.feature_stds < 1e-12, 1.0, self.feature_stds)
 
         # Apply the scaling.
-        return (X - self.means) / safe_stds
+        return (X - self.feature_means) / safe_stds
 
     def preprocess_input(self, sample: dict):
         """
@@ -88,15 +87,15 @@ class Preprocessor:
         :param sample: The dictionary containing raw feature inputs.
         """
         # First validate the input
-        sample = self.validate(sample)
+        sample = self.validate_input(sample)
 
         # Then order the features.
-        ordered = [sample[f] for f in self.features]
+        ordered = [sample[f] for f in self.feature_names]
 
         # Then we convert to a dataframe and scale and reshape the array for prediction.
         X = np.array(ordered, dtype = float).reshape(1, -1)
         
         # Apply scaling.
-        X_scaled = self.scale(X)
+        X_scaled = self.safe_scaling(X)
 
         return X_scaled
