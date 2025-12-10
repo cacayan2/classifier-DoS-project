@@ -1,5 +1,6 @@
 # Group Members and Names
 ## Class: COMP 479; Dr. Manar Mohaisen Fall 2025
+## Final Project ADR
 - **Emil Cacacayan**
     + LUC UID: ecacayan
     + LUC Student ID: 00001521140
@@ -37,7 +38,7 @@ From a cybersecurity perspective, detecting DoS attacks offers quite a few benef
 
 Another important project goal is clear communication and collaboration. This is a group project, and so early on in the project design, expertise and interest were expressed by the members of the group. This repository's structure, project board, and communication expectations are designed to help the team maintain organization while ensuring that deliverables are submitted in a timely manner. Each notebook or script serves a purpose, and every team member is expected to record any findings, developments, or decisions in a shared and visible format. This reinforces the way collaboration is performed in the real world where teams coordinate across parts of an even larger workflow. 
 
-Finally, we want to develop our tools and deployment in a way that fosters reproducibility, maintainability, and code potability. In this project, we also outline a schema file describing the final structure of the cleaned dataset so that both end-users and developers forking off the project can apply the same manipulations to their own datasets consistently. This is essential for maintaining reliable data pipelines in production-level environments (Breck et al., 2019). Even though our project does not involve full production deployment, preparing an API skeleton and defining data requirements is a fundamental part of this development process and helps reinforce all previously mentioned points.
+Finally, we want to develop tools and deployment in a way that fosters reproducibility, maintainability, and code potability. In this project, we also outline a schema file describing the final structure of the cleaned dataset so that both end-users and developers forking off the project can apply the same manipulations to their own datasets consistently. This is essential for maintaining reliable data pipelines in production-level environments (Breck et al., 2019). Even though project does not involve full production deployment, preparing an API skeleton and defining data requirements is a fundamental part of this development process and helps reinforce all previously mentioned points.
 
 The project goals can be divided into 5 parts:
 1. Build an end-to-end and well-documented pipeline for detecting adverse network traffic.
@@ -61,11 +62,11 @@ This dataset includes many different types of DoS attacks along with different s
 
 2. **Acceptance of the dataset as a benchmark within cybersecurity and machine learning research**
 
-A few surveys identify this dataset and the rest of its family (CIC-IDS) as one of the more commonly used and meticulously designed options for experimentation (Ring et al., 2019). This allows for our work to be easily comparable with other similar research projects.
+A few surveys identify this dataset and the rest of its family (CIC-IDS) as one of the more commonly used and meticulously designed options for experimentation (Ring et al., 2019). This allows for work to be easily comparable with other similar research projects.
 
 3. **Availability of labels**
 
-This dataset includes well-defined labels for every type of traffic - this lends itself to supervised learning and allows for easier evaluation of our models.
+This dataset includes well-defined labels for every type of traffic - this lends itself to supervised learning and allows for easier evaluation of models.
 
 4. **Practical for ETL**
 
@@ -100,7 +101,7 @@ Python and its libraries allow for a paradigm that lends itself to big data proc
 ## 4.1 Context and Technology Choice
 In the transformation step, the data was cleaned and standardized to increase fidelity and reproducibility of downstream transformations and training. This process includes dropping unnecessary (such as index) columns or duplicates, implementing consistent column naming patterns, and filtering out particular labels (in this case, `Heartbleed` was filtered out due to not being a DoS attack, which models downstream will be trained to discriminate). 
 
-All of these operations are performed in the script `etl/clean_dataset.py` and documented in `notebooks/00_etl_exploration.ipynb`. This cleaned dataset is saved in `data/cleaned/wednesday_clean.csv`, the naming is due to the fact that this dataset (theoretically) contains label from Wednesday traffic, since the Wednesday traffic flows contain the labels required for training our model. Lastly, to ensure this classification task remains binary and not categorical, the different DoS attacks were encoded to binary 0/1 (representing benign or attack respectively). 
+All of these operations are performed in the script `etl/clean_dataset.py` and documented in `notebooks/00_etl_exploration.ipynb`. This cleaned dataset is saved in `data/cleaned/wednesday_clean.csv`, the naming is due to the fact that this dataset (theoretically) contains label from Wednesday traffic, since the Wednesday traffic flows contain the labels required for training models. Lastly, to ensure this classification task remains binary and not categorical, the different DoS attacks were encoded to binary 0/1 (representing benign or attack respectively). 
 
 In other words,
 
@@ -271,18 +272,76 @@ Findings from PCA and clustering guide later stages with information on whether 
 
 # 8. Data Preprocessing
 ## 8.1 Context and Technology Choice
+The goal of this preprocessing stage is to make sure that all features are clean, numeric, consistent, and standardized before training. The original dataset contains mixed formats, outliers, and issues with scale - common in this type of network traffic dataset. A structured preprocessing pipeline was therefore warranted. 
+
+The preprocessing pipeline includes two stages - one performed prior to training, the other performed prior to deployment. In the training preprocessing implemented in the ETL and EDA notebooks, cleaning steps included standardizing feature names, removing non-numeric artifacts, verifying correct number of features, validating label categories, and producing a binary label. Final feature scaling statistics were computed from this trained cleaned dataset. In terms of deployment, this was implemented in the script `deployment/preprocessing.py` using the same steps. The main difference is that this process is largely codified in the `/data/final_features.json` file. At inference time, the system validates incoming samples, ensures they contain all required features, enforces numeric types, applies transformations, and arranges values in the correct order expected by the model.
+
+This approach follows the principle that preprocessing pipelines should be consistent between training and production environments to prevent "training-serving skew" (Zaharia et al., 2018). All transformations under this paradigm are deterministic and reproducible. 
+
+All preprocessing logic required has been documented in the ETL and EDA notebooks. The deployment-time preprocessing pipeline has been fully implemented in `deployment/preprocessing.py` and validated using edge-cases in `notebooks/06_deployment_tests.ipynb`.
+
 ## 8.2 Justifications
+A few motivations guided the design of this preprocessing pipeline:
+
+1. **Consistency and Reproducibility**
+One of the big caveats in network intrusion datasets is reproducibility across different stages (Sharafaldin et al., 2018). By centralizing feature metadata and processing logic in a schema file instead of scattering the process across scripts and notebooks (paritcularly in a large project like this with multiple collaborators), we can prevent issues with feature order, scaling parameters, and input validation. 
+
+2. **Standardization**
+The team decided upon the design of the preprocessing pipeline prior to model evaluation, and it was understood that some of the algorithms tested in this project were not robust against highly variable feature scale. Standardizing features improves stability and produces better convergence behavior (Pedregosa et al., 2011). Although tree-based models are scale-invariant, adding a scaling step to the preprocessing pipeline keeps the models more interpretable by ensuring consistency without affecting their performance. 
+
+3. **Robust Error Handling**
+Because this project involves cybersecurity, there is a risk of malformed input data. This pipeline includes explicit missing feature checks, extra feature checks, data type enforcement, and null type rejection. Prior literature emphasizes the use of strict input validation to prevent model misuse (Sommer & Paxson, 2010).
+
+4. **Separation of Tasks**
+Separating preprocessing from model training and inference allows for a more efficient workflow. The team was more or less able to work independently on different parts of the project, assisting in streamlining the development of the project timeline. 
+
 ## 8.3 Status
+**Status**: Accepted  
+**Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan  
+**Date**: December 4, 2025
 
 # 9. Feature Engineering
 ## 9.1 Context and Technology Choice
+In this project, feature engineering refers to the sum set of operations used to prepare raw data (network traffic) into meaningful features that can be used to train machine learning models. The CIC-IDS2017 dataset provides a comprehensive set of flow-based features (Sharafaldin et al., 2018), so the team decided not to create new transformations. Instead, core feature selection comes from the work done in EDA. Highly collinear features were removed since they do not provide unique information for the model. In addition, PCA was explored but its performance was not sufficient to justify its inclusion as a dimensionality reduction method. Overall, the feature engineering steps included those outlined in the assignment (only columns relevant to the Wednesday attack scenarios, labels outside the assignment scope removed such as Heartbleed), standardizing and rationalizing feature names, creation of the binary target variable (0 = benign traffic, 1 = DoS traffic), validating the presence of numeric only features, and storing the features in a schema. The final set of features used for training is provided in the `/data/final_features.json` file.
+
 ## 9.2 Justifications
+Feature engineering choices were driven by the following considerations:
+
+1. **Alignment with Best Practices**
+The features in the CIC-IDS2017 dataset were designed to be rich enough for ML analysis without requiring researchers to craft new features (Sharafaldin et al., 2018). Just from that literature alone, wedecided to select and refine existing features rather than to generate new ones.
+
+2. **Interpretability and Reproducibility**
+Consistent naming, numeric types, and adherence to the schema enables the team to reproduce results across environments and submissions. This is supported by literature emphasizing the importance of tracking transformations (Zaharia et al., 2018).
+
+3. **Improving model stability and reducing noise**
+Cleaning and normalizing features reduces instability and prevents misleading patterns and errors from propogating through the rest of the pipeline. This is important in intrusion detection where there is often noisy or badly formed features - these can inflate false positive rates (Sommer & Paxson, 2010). 
+
 ## 9.3 Status
+**Status**: Accepted  
+**Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan  
+**Date**: December 4, 2025
 
 # 10. Processed Data Loading
 ## 10.1 Context and Technology Choice
+Processed data loading refers to the process where cleaned, feature-engineered data is read into memory in preparation for modeling, evaluation, and/or deployment. In this project, the processed dataset is stored in `data/cleaned/wednesday_cleaned.csv` and loaded using `pandas` (see [7 Exploratory Data Analysis](#7-exploratory-data-analysis)). This tool was selected mainly because it integrates naturally with downstream libraries such as `scikit-learn` and `numpy`. It also contains several operations for dealing with missing values, type casting, indexing, and other vectorized operations. In addition to loading the cleaned `.csv` file, the pipeline loads the feature schema (`final_features.json` see section [6 Reading Data](#6-reading-data)) into a dictionary for later use. The schema is accessed using Python's built-in `json` module and the team implemented loader functions in `deployment/schema_loader.py`. This design serves as a contract to prevent inconsistency between training and serving (Zaharia et al., 2019).The processed data loading in this context involves two components: loading the cleaned dataset into a `pandas` dataframe, then loading the feature schema. Both components are already integrated into the preprocessing and inference pipelines. Future adjustments may include adding further validation warnings or a more robust error handling module, but deliverables satisfy requirements as-is. 
+
 ## 10.2 Justifications
+1. **Ensures Consistency Between Training and Deployment**
+Loading the dataset and its schema guarantees that models use features in a fixed and validated order. The literature mentions this as one of the primary ways to combat "feature drift", a cause of model degradation (Zaharia et al., 2018). 
+
+2. **Reproducibility and Transparency**
+In storing the cleaned dataset in a static file and loading it during modeling, the project aims to provide repeatable analyses. Reproducibility is a core requirement in data science and intrusion detection - small differences in feature manipulation can alter results dramatically (Sommer & Paxson, 2010). 
+
+3. **Aligns with IDS Workflows**
+Most research that uses this dataset loads cleaned or preprocessed variants of the dataset using CSV readers (Sharafaldin et al., 2018). `pandas` is the defacto standard that serves this purpose. 
+
+4. **Simplicity While Ensuring Deliverables**
+CSV storage and loading avoid overhead of database engines or complex storage systems, which are unnecessary given the size of the dataset. Simply storing the dataset in a static file reduces points of failure while remaining compatible with downstream components of this project.
+
 ## 10.3 Status
+**Status**: Accepted  
+**Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan  
+**Date**: December 4, 2025
 
 # 11. Model Selection and Training
 ## 11.1 Context and Technology Choice
@@ -382,7 +441,7 @@ Ensemble methods and SVM's with RBF kernels tend to be robust against outliers.
 
 Most of the features in this dataset are numeric, so hyperparameter tuning does not have to be as complex.
 
-We rooted the selection of the hyperparameters in empirical EDA findings and established literature - and so this stage of the project is grounded in theory and observed data behavior. 
+The team rooted the selection of the hyperparameters in empirical EDA findings and established literature - and so this stage of the project is grounded in theory and observed data behavior. 
 
 ## 11.3 Status
 **Status**: Accepted (Model Selection)  
@@ -397,7 +456,7 @@ We rooted the selection of the hyperparameters in empirical EDA findings and est
 ## 12.1 Context and Technology Choice
 The evaluation stage focused on assessing the performance of the six selected supervised classification models trained during the modeling phase: Logistic Regression, K-Nearest Neighbors (kNN), Gaussian Naïve Bayes, Decision Tree, Random Forest, and Support Vector Machine (SVM). To ensure consistency and reproducibility, all evaluations were performed using `scikit-learn`'s metrics and plotting utilities, including `classification_report`, `confusion_matrix`, generating ROC curves, and AUC calculations. These tools are widely used in machine learning research and provide standardized and interpretable metrics suitable for comparing different models under identical preprocessing conditions (Pedregosa et al., 2011).
 
-Evluation relied on the test set derived from the 80/20 train-test split. The test set was not used during training, allowing for unbiased evaluation of model generalization. In terms of visualizaiton, we generated confusion matrices and ROC curves for each model to understand misclassification and relative discriminative peroformance across the two labels.
+Evluation relied on the test set derived from the 80/20 train-test split. The test set was not used during training, allowing for unbiased evaluation of model generalization. In terms of visualizaiton, the team generated confusion matrices and ROC curves for each model to understand misclassification and relative discriminative peroformance across the two labels.
 
 Because our project evaluates binary classification within a cybersecurity context, recall and AUC were important. High recall is essential - failing to identify an attack (false negative) is significantly more harmful than incorrectly marking benign traffic as malicious (false positive). Prior work strongly emphasizes the rationale behind addressing this very asymmetrical risk, making obtaining these metrics appropriate for final model decision making (Kumar et al., 2020; Ring et al., 2019). 
 
@@ -409,7 +468,7 @@ All evaluation steps were implemented in the notebook `notebooks/05_model_evalua
 Following evaluation, across all computed metrics, the Random Forest classifier demonstrated the most robust generalization performance and achieved the strongest balance of precision, recall, and F1-score. Visual inspection of these curves demonstrated that this model dominates other models. For this project, Random Forest has been selected as the primary model for deployment in the subsequent development of inference in the deployment API. The `.pkl` file corresponding to the model has been saved to `models/saved_model/`, and the architecture outlined in section 13 assumes its use as the deployed classifier. 
 
 ## 12.2 Justifications
-We implement the evaluation pipeline as described above for the following reasons:
+The team implemented the evaluation pipeline as described above for the following reasons:
 
 1. **Consistency Across Models**
 
@@ -473,8 +532,30 @@ Use of the schema allows for changes to the features without restructuring the a
 
 # 14. Concluding Remarks and Project Summary
 ## 14.1 Context and Technology Choice
+The purpose of this project was to design and implement a machine learning pipeline to distinguish Denial of Service (DoS) attacks from benign network traffic using the CIC-IDS2017 Wednesday dataset. The project required integration of multiple system components, including data extraction, cleaning, schema construction, exploratory data analysis, model training, evaluation, and deployment - into a workflow closely adhering to modern machine learning best practices.
+
+For implementation, the team made a few deliberate technology choices. Python served as the primary due to its large collection of data processing libraries (and its extensive use in COMP479). `pandas` and `numpy` facilitated manipulation and transformation of loaded datasets, simplifying the handling of the highly dimensional network traffic data. `scikit-learn` was selected for modeling because of its suitability for structured data. FastAPI was used for deployment given its speed, simplicity, and built-in validation. A custom schema architecture ensured consistency between training and deployment, preventing feature-ordering and type mismatches often seen in production ML systems (Zaharia et al., 2018). Together, these choices allowed us to create a robust, well-documented, and collaborative approach for first identifying harmful traffic problems and at large implementing, testing, and deploying machine learning models.
+
 ## 14.2 Justifications
+1. **Ensuring Pipeline Reliability and Reproducibility**
+Each stage was designed to guarantee reproducibility. The schema-driven approach ensures that any new dataset or inference request is validated against the same feature constraints used during training, which is as mentioned previously a best practice in machine learning (Zaharia et al., 2018). 
+
+2. **Supporting Interpretability and Diagnostics**
+The modular structure of this pipeline enabled the team to assess data quality, detect outliers and anomalies, and predict downstream effects of upstream decisions.
+
+3. **Addressing the Nature of DoS Attack Traffic**
+DoS attacks produce distinctive flow patterns (abnormally high packet rates and skewed distributions) which justified the project's modeling choices. Random Forests and logistic regression are frequently used for this type of data because of their relatively low tendency to overfit noisy features (Kumar et al., 2020). 
+
+4. **Facilitating Deployment**
+The architecture for preprocessing and inference were packaged within FastAPI, meaning the final inference system is usable outside the environment of the jupyter notebooks used for the analysis portionso f this project. This is a proof-of-concept for real time security monitoring systems (Sharafaldin et al., 2018). 
+
+5. **Clean Separation of Concerns for Productivity and Maintainability**
+The modular structure of the project lent itself to separation of different tasks/concerns, which mirrors software engineering best practices. This also streamlined development of all the stages of our project, as team members could work independently of one another.
+
 ## 14.3 Status
+**Status**: Accepted
+**Date**: December 10, 2025
+**Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan
 
 # 15. References
 Breck, E., Polyzotis, N., Roy, S., Whang, S. E., & Zinkevich, M. (2017). The ML test score: A rubric for production-ready machine learning systems. Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining.
@@ -501,7 +582,13 @@ Ring, M., Wunderlich, S., Scheuring, D., Grüdl, D., Landes, D., & Hotho, A. (20
 
 Sharafaldin, I., Lashkari, A. H., & Ghorbani, A. A. (2018). Toward generating a new intrusion detection dataset and intrusion traffic characterization. ICISSP 2018—Proceedings of the 4th International Conference on Information Systems Security and Privacy, 108–116. https://doi.org/10.5220/0006639801080116 
 
+Sommer, R., & Paxson, V. (2010). Outside the closed world: On using machine learning for network intrusion detection. 2010 IEEE Symposium on Security and Privacy, 305–316.
+https://doi.org/10.1109/SP.2010.25
+
 Tiangolo, S. (2018). FastAPI documentation. https://fastapi.tiangolo.com
 
 van der Aalst, W. (2022). Process mining and data quality: A review of challenges and opportunities. ACM Computing Surveys, 55(7), 1–39.
 https://doi.org/10.1145/3527154
+
+Zaharia, M., Wendell, P., Das, T., Armbrust, M., Dave, A., Meng, X., Rosen, J., & Stoica, I. (2018). An overview of machine learning pipelines in production. Communications of the ACM, 61(4), 36–45.
+https://doi.org/10.1145/3184402
