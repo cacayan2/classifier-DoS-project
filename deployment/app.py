@@ -1,10 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 import joblib
 import json
 from pathlib import Path
 
 from deployment.schema_loader import load_schema
-from deployment.preprocessing import preprocess_input
+from deployment.preprocessing import Preprocessor
 
 # First we create a new FastAPI object
 app = FastAPI(
@@ -16,6 +16,9 @@ app = FastAPI(
 # Load the schema
 SCHEMA_PATH = Path("data/final_features.json")
 schema = load_schema(SCHEMA_PATH)
+
+# Then we create the preprocessor object.
+preprocessor = Preprocessor(schema_path = SCHEMA_PATH)
 
 # Load the trained model
 MODEL_PATH = Path("models/saved_model/random_forest.pkl")
@@ -39,10 +42,19 @@ def version():
 # Implementation of prediction endpoint (inference not yet implemented)
 @app.post("/predict")
 def predict(input_data: dict):
-    if model is None:
-        return {"error": "Model is not available - please train"}
-    
-    # Preprocess input data
-    processed = preprocess_input(input_data, schema)
-    prediction = model.predict([processed])[0]
-    return {"prediction": int(prediction)}
+    # Running preprocessing with sanity checking.
+    try:
+        X = preprocessor.preprocess_input(input_data)
+    except Exception as e:
+        raise HTTPException(
+            status_code = 400, 
+            detail = f"Failed to preprocess input data: {e}"
+        )
+    try:
+        y_pred = model.predict(X)
+    except Exception as e:
+        raise HTTPException(
+            status_code = 500, 
+            detail = f"Failed to make predictions: {e}"
+        )
+    return {"prediction": int(y_pred[0])}
