@@ -442,8 +442,34 @@ The evaluation pipeline also allows downstream deployment possesses the model wi
 
 # 13. Model Deployment
 ## 13.1 Context and Technology Choice
+The deployment stage of this project focuses on making the trained DoS classifier operational so that predictions can be generated through an API. We chose to adopt a simple deployment approach, where the model is saved to a `.pkl` file and can be loaded and used for predictions in a subsequent deployment API. The architecture we chose was built around a FastAPI application. In this architecture, incoming network-flow samples are validated, transformed, and then passed to the model for inference, returning a binary prediction for benign or attack traffic. 
+
+The deployment pipeline is organized within this project's `deployment/` directory and includes the following components:
+1. `app.py`: Implements `/health`, `/version`, and `/predict` endpoints for the API. It loads the trained model and uses the preprocessing pipeline to transform inputs before inference.
+2. `schema_loader.py`: Loads the `final_features.json` schema that defines expected input features, types, and transformations. The schema generated earlier ensures consistent preprocessing and feature ordering.
+3. `preprocessing.py`: Validates input samples, checks for missing or unexpected fields, enforces data types, converts features to numeric values, and applies scaling transformations using statistics stored in the schema. 
+4. `final_features.json`: Encodes the feature set, expected preprocessing parameters, and statistics used dduring model training. This helps to guarantee reproducibility across the entire inference pipeline. 
+
+This modular approach aligns with design patterns in machine learning deployment, where preprocessing and inference logic is ideally consistent between training and production environments (Raschka et al., 2022; Zaharia et al., 2018). The architecture is intentionally simple to make local testing easier, but could be further expanded and perhaps containerized.
+
+This architecture has been implemented and tested locally, with all endpoints operational. Preprocessing validation, schema loading, and app architecture are implemented in `deployment/preprocessing.py`, `deployment/schema_loader.py`, and `deployment/app.py`, respectively. Testing both locally and with Postman are performed/demonstrated in `notebooks/06_deployment.ipynb`.
+
 ## 13.2 Justifications
+We had several considerations that led us to choose this deployment architecture:
+
+1. **FastAPI for the API Layer**
+We chose this API because of its strong performance, intuitive syntax, and built-in validation, which is commonly used in production ML systems. One of the main advantages of FastAPI is its low latency and ability to perform asynchronously - which adds to the speed at which inference occurs which is key in many network traffic applications (Ramírez & Lanusse, 2022). 
+
+2. **Schema for Consistency and Reproducibility**
+Using the `final_features.json` schema offers quite a few advantages. The first is consistency - we can guarantee that the same feature transformations are applied in training and deployment. Additionally, the schema serves as documentation including statistics, types, and metadata which makes our pipeline more transparent - making it easy to audit or debug.
+
+3. **Modularity**
+Use of the schema allows for changes to the features without restructuring the architecture, which is essential for the maintainability and portability of our code. This is not only a machine learning paradigm, but a general software development best practice.
+
 ## 13.3 Status
+**Status**: Accepted  
+**Date**: December 6-7, 2025  
+**Team Members**: Fnu Syed Moosa Aleem "Moosa", Umar Siddiqui, Nafisa Sabir, Emil Cacayan
 
 # 14. Concluding Remarks and Project Summary
 ## 14.1 Context and Technology Choice
