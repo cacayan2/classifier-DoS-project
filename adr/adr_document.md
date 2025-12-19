@@ -441,7 +441,6 @@ Processed data loading refers to the process where cleaned, feature-engineered d
 Below you can find the first 20 rows of the cleaned dataset:
 
 | Destination_Port | Flow_Duration | Total_Fwd_Packets | Total_Backward_Packets | Total_Length_of_Fwd_Packets | ... | Idle_Std | Idle_Max | Idle_Min | Label | Attack | |
-
 |------------------|---------------|-------------------|------------------------|-----------------------------|-------|----------|--------------|----------|----------|--------|---|
 | 0                | 443           | 87261             | 1                      | 1                          | 0     | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
 | 1                | 443           | 523               | 2                      | 0                          | 0     | ...      | 0.00000      | 0        | 0        | BENIGN | 0 |
