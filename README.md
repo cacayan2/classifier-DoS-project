@@ -1,5 +1,14 @@
 ﻿# DoS Attack Binary Classifier Using CIC-IDS2017 Dataset
 
+## Overview
+We developed a machine learning classification pipeline including data preprocessing, feature engineering, exploratory analysis, model training, evaluation, and deployment. 
+
+## Key Features
+- Structured data preprocessing workflow
+- Feature extraction for classification
+- Model training and evaluation using scikit-learn
+- Modular pipeline design
+
 ## Team Members & Roles
 - **Emil Cacayan**: Manages GitHub repo and project, deployment, documentation (ADR), organization
 - **Umar Siddiqui**: Modeling (simple models and train/test splitting, data preprocessing)
